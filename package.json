@@ -1,0 +1,24 @@
+{
+  "name": "mmm-toggle-by-presence",
+  "version": "1.0.0",
+  "description": "This module checks the values from a I²C proximity sensor (presence detection) and shows/hides the DOM.",
+  "main": "mmm-toggle-by-presence.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moejetz/mmm-toggle-by-presence.git"
+  },
+  "keywords": [
+    "Magic",
+    "Mirror",
+    "MagicMirror"
+  ],
+  "author": "Moritz Kraus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/moejetz/mmm-toggle-by-presence/issues"
+  },
+  "homepage": "https://github.com/moejetz/mmm-toggle-by-presence#readme"
+}
