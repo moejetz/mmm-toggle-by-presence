@@ -4,7 +4,8 @@
   "description": "This module checks the values from a I²C proximity sensor (presence detection) and shows/hides the DOM.",
   "main": "mmm-toggle-by-presence.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd range_detector && touch detection_state && chmod 777 detection_state && touch Range && sudo make clean && sudo make"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/moejetz/mmm-toggle-by-presence/issues"
   },
-  "homepage": "https://github.com/moejetz/mmm-toggle-by-presence#readme"
+  "homepage": "https://github.com/moejetz/mmm-toggle-by-presence#readme",
+  "dependencies": {
+    "node-watch": "^0.6.2"
+  }
 }

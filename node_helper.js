@@ -8,6 +8,9 @@
 
 var NodeHelper = require("node_helper");
 var shell = require('shelljs');
+const { spawn } = require('child_process');
+var watch = require('node-watch');
+var fs = require('fs');
 
 
 module.exports = NodeHelper.create({
@@ -15,6 +18,7 @@ module.exports = NodeHelper.create({
 	//control flow params
 	updateInterval: 500, // update interval for presence detection
 	detectionTimeout: 10000, //mirror will be turned off if no detection in this timespan
+	validRange: 40, // the range in mm where a person is detected
 	lastDetection: 0, // last detection timestamp
 	now: 0, // current timestamp
 	currentDetectionState: false, // current (old) detection state
@@ -31,6 +35,7 @@ module.exports = NodeHelper.create({
 
 		if(payload.hasOwnProperty("updateInterval")) this.updateInterval = payload.updateInterval;
 		if(payload.hasOwnProperty("detectionTimeout")) this.detectionTimeout = payload.detectionTimeout;
+		if(payload.hasOwnProperty("validRange")) this.validRange = payload.validRange;
 
 		if(!this.isPresenceDetectionStarted) {
 			this.startPresenceDetection();
@@ -39,58 +44,93 @@ module.exports = NodeHelper.create({
 
 	startPresenceDetection: function () {
 
-		console.log("START PRESENCE DETECTION");
 		var self = this;
+		if(self.updateInterval >= 500) {
+			console.log("mmm-toggle-by-presence: START PRESENCE DETECTION. Interval: " + self.updateInterval);
+		} else {
+			self.updateInterval = 500;
+			console.log("mmm-toggle-by-presence: START PRESENCE DETECTION. Interval set to 500ms (min value)");
+		}
+
 		self.isPresenceDetectionStarted = true;
 
-		setInterval(function(){
-
-			try {
-
-			  self.newDetectionState = Math.random() >= 0.5;
-		      self.now = new Date().getTime();
-
-		      if(self.currentDetectionState && (self.now-self.lastDetection)<self.detectionTimeout) {
-
-		          // restart timeout when presence is detected
-		          if(self.newDetectionState) {
-		            console.log('Presence detected. Reset timeout counter');
-		            self.lastDetection=self.now;
-
-		          } else {
-		            console.log('No presence detected. Timeout: ', (self.now-self.lastDetection)/1000);
-		          }
-
-		          return;
-		      }
-
-		      // timeout has finished, there was an detection state change
-		      if(self.currentDetectionState!=self.newDetectionState) {
-
-		          self.currentDetectionState = self.newDetectionState;
-		          if(self.newDetectionState) {
-
-		              self.lastDetection = self.now;
-
-		              // make sure hdmi is turned on
-		              self.hdmiTurnOn();
-		          }
-
-		          // publish new detection state
-				  self.sendSocketNotification("mmm-toggle-by-presence-notification", {detectionState: self.newDetectionState});
-		      }
+		// Start range detector
+		var rangeDetector = spawn(__dirname + '/range_detector/./Range', [self.updateInterval]);
+		/*
+		rangeDetector.stdout.on('data', (data) => {console.log(`stdout: ${data}`);});
+		rangeDetector.stderr.on('data', (data) => {console.log(`stderr: ${data}`);});
+		rangeDetector.on('close', (code) => {console.log(`child process exited with code ${code}`);});
+		*/
 
 
-		    } catch (e) {
-		      console.error('Error: '+e);
-		      self.sendSocketNotification("mmm-toggle-by-presence-notification", {detectionState: false});
+		console.log("mmm-toggle-by-presence: PRESENCE DETECTION STARTED.");
 
-		    }
+		var watcher = watch(__dirname + '/range_detector/detection_state');
+	    watcher.on('change', function(evt, name) {
 
-		}, self.updateInterval);
+			fs.readFile(name, 'utf8', function (err, data) {
+				if (err) {
+					return console.log(err);
+	        	}
+
+	        	self.analyzeDistance(self, data);
+
+	        });
+
+	    });
 
 	},
 
+
+
+	analyzeDistance: function(self, distance) {
+
+
+		try {
+
+			console.log("mmm-toggle-by-presence: current distance is " + distance + "mm");
+			self.newDetectionState = distance < self.validRange;
+	      	self.now = new Date().getTime();
+
+	      	if(self.currentDetectionState && (self.now-self.lastDetection) < self.detectionTimeout) {
+
+				// restart timeout when presence is detected
+				if(self.newDetectionState) {
+					console.log('Presence detected. Reset timeout counter');
+					self.lastDetection=self.now;
+
+				} else {
+					console.log('mmm-toggle-by-presence: no presence detected. Timeout: ', (self.now-self.lastDetection)/1000);
+				}
+
+				return;
+			}
+
+			// timeout has finished, there was an detection state change
+			if(self.currentDetectionState!=self.newDetectionState) {
+
+				self.currentDetectionState = self.newDetectionState;
+
+				if(self.newDetectionState) {
+
+					self.lastDetection = self.now;
+					// make sure hdmi is turned on
+					self.hdmiTurnOn();
+	          	}
+
+				// publish new detection state
+				self.sendSocketNotification("mmm-toggle-by-presence-notification", {detectionState: self.newDetectionState});
+			}
+
+
+	    } catch (e) {
+	      console.error('Error: '+e);
+	      self.sendSocketNotification("mmm-toggle-by-presence-notification", {detectionState: true});
+
+	    }
+
+
+	},
 
 
 	hdmiTurnOn: function() {

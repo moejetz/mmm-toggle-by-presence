@@ -4,7 +4,7 @@ This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror
 
 
 ## Short description
-Checks the values from a I²C proximity sensor (presence detection) and shows/hides the complete HTML body.
+Checks the values from a I²C proximity sensor VL53L1X (presence detection) and shows/hides the complete HTML body.
 Aditionally, there are methods in the node_helper.js to toggle the HDMI output of the RPI, to be able to completely shut down the HDMI monitor to save power.
 
 
@@ -20,7 +20,8 @@ WIP.
 
 ## Using the module
 
-To use this module, add the following configuration block to the modules array in the `config/config.js` file:
+* run ```npm install```
+* Add the following configuration block to the modules array in the `config/config.js` file:
 ```js
 var config = {
     modules: [
@@ -29,7 +30,8 @@ var config = {
             position: 'fullscreen_below',
             config: {
                 "updateInterval": 500,
-                "detectionTimeout": 10000
+                "detectionTimeout": 10000,
+                "validRange": 40
             }
         }
     ]
@@ -40,8 +42,9 @@ var config = {
 
 | Option | Required | Description | Type | Default
 | ------ | -------- | ----------- | ---- | -------
-| `updateInterval` | Optional | Update interval for presence detection | _int_ (ms) | 500
+| `updateInterval` | Optional | Update interval for presence detection | _int_ (ms) | 500 (default + min value)
 | `detectionTimeout` | Optional | Mirror will be turned off if no detection in this timespan | _int_ (ms) | 10000
+| `validRange` | Optional | Range in mm where a person is detected  | _int_ (mm) | 40
 
 
 # License: MIT
