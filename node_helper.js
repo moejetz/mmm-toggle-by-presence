@@ -12,28 +12,27 @@ const { spawn } = require('child_process');
 var watch = require('node-watch');
 var fs = require('fs');
 
-const MODULE_NAME = 'mmm-toggle-by-presence'; // module name
-const SOCKET_NOTIFICATION_KEY = 'mmm-toggle-by-presence-notification-key'; // socket communication key
+const MODULE_NAME = 'mmm-toggle-by-presence'; // Module name
+const SOCKET_NOTIFICATION_KEY = 'mmm-toggle-by-presence-notification-key'; // Socket communication key
 
 
 module.exports = NodeHelper.create({
 
 	// Control flow params, settable via MagicMirror2 config
-	updateInterval: 500, // Update interval for presence detection
-	detectionTimeout: 10000, // Mirror will be turned off if no detection in this timespan
-    validRange: 40, // The range in cm where a person is detected
-    debug: true, // Show debug output of range detector
+	updateInterval: 500,        // Update interval for presence detection
+	detectionTimeout: 10000,    // Mirror will be turned off if no detection in this timespan
+    validRange: 40,             // The range in cm where a person is detected
+    debug: true,                // Show debug output of range detector
 
     // Internal variables
-	lastDetection: 0, // last detection timestamp
-	now: 0, // current timestamp
-	oldDetectionState: false, // current (old) detection state
-	newDetectionState: false, // new detection state
-	isHdmiOn: true, // indicator for power state of HDMI monitor
-	isPresenceDetectionStarted: false,
+	lastDetection: 0,                  // Last detection timestamp
+	now: 0,                            // Current timestamp
+	oldDetectionState: false,          // Current (old) detection state
+	newDetectionState: false,          // New detection state
+	isHdmiOn: true,                    // Power state indicator for HDMI monitor
+	isPresenceDetectionStarted: false, // Presence detection started indicator
 
 
-	// @Override MagicMirror module functions
 	// Used for initialisation. Read and set config overrides, then start presence detection as singleton.
 	socketNotificationReceived: function(notification, payload) {
 
@@ -48,17 +47,18 @@ module.exports = NodeHelper.create({
             console.log(MODULE_NAME + ': ignoring new config data because the presence detection has already been started.');
 
         } else {
-			// set config overrides
+			// Set config overrides
 			if(payload.hasOwnProperty('updateInterval')) this.updateInterval = payload.updateInterval;
 			if(payload.hasOwnProperty('detectionTimeout')) this.detectionTimeout = payload.detectionTimeout;
 			if(payload.hasOwnProperty('validRange')) this.validRange = payload.validRange;
             if(payload.hasOwnProperty('debug')) this.debug = payload.debug;
 
-			// start presence detection
 			this.startPresenceDetection();
 		}
 	},
 
+
+    // Start presence detection
 	startPresenceDetection: function () {
 
 		var self = this;
@@ -98,12 +98,13 @@ module.exports = NodeHelper.create({
 	},
 
 
-
+    // Process new distance value
 	analyzeDistance: function(self, distance) {
 
 		try {
 
-            if(!distance || distance === undefined) distance = 0; // fix in case the sensor did not send a valid value
+            // Fix in case the sensor did not send a valid value
+            if(!distance || distance === undefined) distance = 0;
 
             self.logDebug(self, 'current distance is ' + distance + 'cm');
 			self.newDetectionState = distance < self.validRange;
@@ -130,7 +131,7 @@ module.exports = NodeHelper.create({
 
 				if(self.newDetectionState) {
 					self.lastDetection = self.now;
-					self.hdmiTurnOn(); // make sure hdmi is turned on
+					self.hdmiTurnOn(); // Make sure HDMI output is turned on
 	          	}
 
 				// Publish new detection state
@@ -139,14 +140,15 @@ module.exports = NodeHelper.create({
 
 
 	    } catch (e) {
-	      console.error(MODULE_NAME + ':', e);
-          self.publishState(self, true); // In case of error, always return true so the mirror's display is turned on constantly
+            // In case of an error, always return true so the mirror's display keeps turned on constantly
+            console.error(MODULE_NAME + ':', e);
+            self.publishState(self, true);
 	    }
 
 	},
 
 
-    // Turn RPI HDMI output ON
+    // Turn on Raspberry Pi HDMI output
 	hdmiTurnOn: function() {
 
         this.logDebug(this, 'turn HDMI monitor ON')
@@ -162,7 +164,7 @@ module.exports = NodeHelper.create({
 
 	},
 
-    // Turn RPI HDMI output ON
+    // Turn off Raspberry Pi HDMI output
 	hdmiTurnOff: function() {
 
 		this.logDebug(this, 'turn HDMI monitor OFF')

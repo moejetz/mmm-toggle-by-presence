@@ -25,7 +25,7 @@ Module.register(MODULE_NAME, {
 	},
 
 
-	// socketNotificationReceived from helper
+	// Socket notification callback from node_helper.js
 	socketNotificationReceived: function (notification, payload) {
 		if(notification === SOCKET_NOTIFICATION_KEY) {
 
