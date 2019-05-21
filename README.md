@@ -31,7 +31,8 @@ var config = {
             config: {
                 "updateInterval": 500,
                 "detectionTimeout": 10000,
-                "validRange": 40
+                "validRange": 40,
+                "debug": true
             }
         }
     ]
@@ -44,7 +45,8 @@ var config = {
 | ------ | -------- | ----------- | ---- | -------
 | `updateInterval` | Optional | Update interval for presence detection | _int_ (ms) | 500 (default + min value)
 | `detectionTimeout` | Optional | Mirror will be turned off if no detection in this timespan | _int_ (ms) | 10000
-| `validRange` | Optional | Range in mm where a person is detected  | _int_ (mm) | 40
+| `validRange` | Optional | Range in cm where a person is detected  | _int_ (cm) | 40
+| `debug` | Optional | Show debug output of range detector | boolean | true
 
 
 # License: MIT

@@ -7,26 +7,31 @@
  * MIT Licensed.
  */
 
-Module.register("mmm-toggle-by-presence", {
+const MODULE_NAME = 'mmm-toggle-by-presence'; // Module name
+const SOCKET_NOTIFICATION_KEY = 'mmm-toggle-by-presence-notification-key'; // Socket communication key
 
-	detectionState: true, // current presence detection state
+Module.register(MODULE_NAME, {
+
+
+	detectionState: true, // Current presence detection state
+
 
 	getScripts: function() {
-		return ["modules/mmm-toggle-by-presence/js/jquery.js"];
+		return ['modules/' + MODULE_NAME + '/js/jquery.js'];
 	},
 
+	// Initialize bidirectional node_helper communication
 	start: function() {
-		// Do this to initialize bidirectional node_helper communication
-		this.sendSocketNotification("mmm-toggle-by-presence-notification", this.config);
+		this.sendSocketNotification(SOCKET_NOTIFICATION_KEY, this.config);
 		$('body').hide();
 	},
 
 
 	// socketNotificationReceived from helper
 	socketNotificationReceived: function (notification, payload) {
-		if(notification === "mmm-toggle-by-presence-notification") {
+		if(notification === SOCKET_NOTIFICATION_KEY) {
 
-			if(this.detectionState!=payload.detectionState) {
+			if(this.detectionState != payload.detectionState) {
 				this.detectionState = payload.detectionState;
 				this.updateDom();
 			}
@@ -34,33 +39,23 @@ Module.register("mmm-toggle-by-presence", {
 		}
 	},
 
+	// MagicMirror2 function to update the DOM.
+	// Used to display/hide the complete body
 	getDom: function() {
 
-
 		var self = this;
-		console.log('Server callback triggered! DetectionState: '+self.detectionState);
-
-		var wrapper = document.createElement("div");
-
-
+		console.log(MODULE_NAME + ': server callback triggered! DetectionState: ', self.detectionState);
 
 	    if(self.detectionState) {
-
-			console.log("Turn display modules ON...");
+			console.log(MODULE_NAME + ': turn display modules ON...');
 			$('body').fadeIn(1000);
 
-
-
 	    } else {
-
-    		console.log("Turn display modules OFF...");
+    		console.log(MODULE_NAME + 'turn display modules OFF...');
     		$('body').fadeOut(1000);
-
-			//$(overlay).hide();
-			//$(overlay).fadeIn(1000, function() {});
 	    }
 
-		return wrapper;
+		return document.createElement('div');
 	},
 
 
