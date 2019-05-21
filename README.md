@@ -20,8 +20,9 @@ WIP.
 
 ## Using the module
 
-* run ```npm install```
-* Add the following configuration block to the modules array in the `config/config.js` file:
+* Clone this repository to `MagicMirror/modules/`
+* Run ```npm install``` inside the `MagicMirror/modules/mmm-toggle-by-presence` folder to install the module
+* Add the following configuration block to the modules array in the `MagicMirror/config/config.js` file, then restart MagicMirror:
 ```js
 var config = {
     modules: [

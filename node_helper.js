@@ -1,5 +1,6 @@
 /* Magic Mirror
- * Node Helper: mmm-toggle-by-presence
+ * Node Helper for module: mmm-toggle-by-presence
+ * Repository URL: https://github.com/moejetz/mmm-toggle-by-presence
  *
  * By Moritz Kraus
  * MIT Licensed.

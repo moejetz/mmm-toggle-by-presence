@@ -1,7 +1,6 @@
-/* global Module */
-
 /* Magic Mirror
  * Module: mmm-toggle-by-presence
+ * Repository URL: https://github.com/moejetz/mmm-toggle-by-presence
  *
  * By Moritz Kraus
  * MIT Licensed.
@@ -11,7 +10,6 @@ const MODULE_NAME = 'mmm-toggle-by-presence'; // Module name
 const SOCKET_NOTIFICATION_KEY = 'mmm-toggle-by-presence-notification-key'; // Socket communication key
 
 Module.register(MODULE_NAME, {
-
 
 	detectionState: true, // Current presence detection state
 
@@ -56,9 +54,7 @@ Module.register(MODULE_NAME, {
 	    }
 
 		return document.createElement('div');
-	},
-
-
+	}
 
 
 });
