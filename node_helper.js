@@ -135,7 +135,7 @@ module.exports = NodeHelper.create({
 	          	}
 
 				// Publish new detection state
-                self.publishState(self, self.detectionState);
+                self.publishState(self, self.newDetectionState);
 			}
 
 
@@ -182,7 +182,7 @@ module.exports = NodeHelper.create({
 
     // Publish state to module (mmm-toggle-by-presence.js)
     publishState: function(self, state) {
-        self.sendSocketNotification(SOCKET_NOTIFICATION_KEY, {detectionState: state});
+        self.sendSocketNotification(SOCKET_NOTIFICATION_KEY, {'detectionState': state});
     },
 
     // Log debug messages, if debug is enabled (enabled by default)
