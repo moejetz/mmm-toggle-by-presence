@@ -32,8 +32,9 @@ std::string GetDetectionStateFilePath( void ) {
 
 int main(int argc, char** argv) {
 
+
     if(argc != 2) {
-        cout << "please set updateInterval, e.g. ./main 500" << "\n";
+        cout << "Please set updateInterval, e.g. ./Range 500" << "\n";
         return -1;
     }
 
@@ -46,20 +47,26 @@ int main(int argc, char** argv) {
     }
 
     string detectionStateFilePath = GetDetectionStateFilePath();
+    cout << "File path: " << detectionStateFilePath << "\n";
     ofstream filestream;
 
     // VL53L1X sensor initialization
     Distance_Sensor.begin();
+    cout << "Distance Sensor initialized." << "\n";
 
     while(1) {
 
+        cout << "Start measurement... ";
         Distance_Sensor.startMeasurement(); //Write configuration bytes to initiate measurement
+
 
           //Poll for completion of measurement. Takes 40-50ms.
         while(Distance_Sensor.newDataReady() == false){
             usleep(5);
         }
+        cout << "mesaured. ";
         int distance = Distance_Sensor.getDistance(); //Get the result of the measurement from the sensor
+        cout << "Distance: " << distance << "\n";
 
         filestream.open(detectionStateFilePath);
         if (filestream.is_open()){ //checking for existence of file

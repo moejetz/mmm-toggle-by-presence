@@ -29,7 +29,6 @@ module.exports = NodeHelper.create({
 	now: 0,                            // Current timestamp
 	oldDetectionState: false,          // Current (old) detection state
 	newDetectionState: false,          // New detection state
-	isHdmiOn: true,                    // Power state indicator for HDMI monitor
 	isPresenceDetectionStarted: false, // Presence detection started indicator
 
 
@@ -106,9 +105,11 @@ module.exports = NodeHelper.create({
             // Fix in case the sensor did not send a valid value
             if(!distance || distance === undefined) distance = 0;
 
-            self.logDebug(self, 'current distance is ' + distance + 'cm');
-			self.newDetectionState = distance < self.validRange;
+            distance = distance / 10;
+			self.newDetectionState = distance > 5 && distance < self.validRange;
 	      	self.now = new Date().getTime();
+
+            self.logDebug(self, 'current distance is ' + distance + 'cm, old detectionState: ' + self.oldDetectionState + ', new detectionState: ' + self.newDetectionState);
 
 	      	if(self.oldDetectionState && (self.now-self.lastDetection) < self.detectionTimeout) {
 
@@ -135,6 +136,7 @@ module.exports = NodeHelper.create({
 	          	}
 
 				// Publish new detection state
+                self.logDebug(self, "turn modules " + (self.newDetectionState ? "ON" : "OFF"));
                 self.publishState(self, self.newDetectionState);
 			}
 
@@ -152,15 +154,7 @@ module.exports = NodeHelper.create({
 	hdmiTurnOn: function() {
 
         this.logDebug(this, 'turn HDMI monitor ON')
-		if(!this.isHdmiOn) {
-
-			shell.exec('/opt/vc/bin/tvservice -p');
-			this.isHdmiOn=true;
-            this.logDebug(this, 'the HDMI display has been turned on.');
-
-		} else {
-			this.logDebug(this, 'the HDMI display has already been turned on.');
-		}
+        shell.exec('/opt/vc/bin/tvservice -p');
 
 	},
 
@@ -168,15 +162,7 @@ module.exports = NodeHelper.create({
 	hdmiTurnOff: function() {
 
 		this.logDebug(this, 'turn HDMI monitor OFF')
-		if(this.isHdmiOn) {
-
-			shell.exec('/opt/vc/bin/tvservice -o');
-			this.isHdmiOn=false;
-            this.logDebug(this, 'the HDMI display has been turned off.');
-
-		} else {
-            this.logDebug(this, 'the HDMI display has already been turned off.');
-		}
+        shell.exec('/opt/vc/bin/tvservice -o');
 	},
 
 
